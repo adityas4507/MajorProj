@@ -14,8 +14,28 @@ export const useFolders = (folderId?: string) => {
     onError: () => toast.error('Failed to create folder'),
   });
 
+  const renameFolderMutation = useMutation({
+    mutationFn: ({ id, name }: { id: string; name: string }) => foldersApi.rename(id, name),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['files', folderId] });
+      toast.success('Folder renamed');
+    },
+    onError: () => toast.error('Failed to rename folder'),
+  });
+
+  const deleteFolderMutation = useMutation({
+    mutationFn: (id: string) => foldersApi.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['files', folderId] });
+      toast.success('Folder deleted');
+    },
+    onError: () => toast.error('Failed to delete folder'),
+  });
+
   return {
     createFolder: createFolderMutation.mutate,
     isCreating: createFolderMutation.isPending,
+    renameFolder: renameFolderMutation.mutate,
+    deleteFolder: deleteFolderMutation.mutate,
   };
 };

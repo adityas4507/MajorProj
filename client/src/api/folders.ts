@@ -1,19 +1,26 @@
-import { api } from './client';
-import type { FileListResponse, Folder } from './types';
+import { api as client } from './client';
+import type { Folder } from './types';
 
 export const foldersApi = {
-  create: async (name: string, parentId?: string): Promise<Folder> => {
-    const { data } = await api.post<Folder>('/folders', { name, parentId });
-    return data;
-  },
+    create: async (name: string, parentId?: string) => {
+        const res = await client.post<Folder>('/folders', { name, parentId });
+        return res.data;
+    },
 
-  get: async (folderId: string): Promise<Folder> => {
-    const { data } = await api.get<Folder>(`/folders/${folderId}`);
-    return data;
-  },
+    list: async (folderId?: string) => {
+        // This is usually handled by filesApi.list but good to have if needed specifically
+        const url = folderId ? `/folders/${folderId}/list` : '/files/list';
+        const res = await client.get(url);
+        return res.data;
+    },
 
-  listContents: async (folderId: string): Promise<FileListResponse> => {
-    const { data } = await api.get<FileListResponse>(`/folders/${folderId}/list`);
-    return data;
-  }
+    rename: async (id: string, name: string) => {
+        const res = await client.patch<Folder>(`/folders/${id}`, { name });
+        return res.data;
+    },
+
+    delete: async (id: string) => {
+        const res = await client.delete(`/folders/${id}`);
+        return res.data;
+    }
 };

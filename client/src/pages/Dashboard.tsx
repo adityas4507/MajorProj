@@ -22,7 +22,7 @@ export const Dashboard: React.FC = () => {
         downloadFile
     } = useFiles(folderId);
 
-    const { createFolder } = useFoldersHook(folderId);
+    const { createFolder, renameFolder, deleteFolder } = useFoldersHook(folderId);
 
     const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files?.[0]) {
@@ -90,6 +90,8 @@ export const Dashboard: React.FC = () => {
                             onNavigate={handleNavigate}
                             onDownload={(file) => downloadFile({ id: file.id, name: file.name })}
                             onDelete={(file) => deleteFile(file.id)}
+                            onRenameFolder={(id, name) => renameFolder({ id, name })}
+                            onDeleteFolder={deleteFolder}
                         />
                     )}
                 </main>

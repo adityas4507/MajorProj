@@ -81,4 +81,78 @@ router.get("/:id/list", requireAuth, async (req: AuthRequest, res, next) => {
   }
 });
 
+router.delete("/:id", requireAuth, async (req: AuthRequest, res, next) => {
+    try {
+        const folderId = req.params.id;
+
+        // Verify folder ownership
+        const folder = await prisma.folder.findUnique({ where: { id: folderId } });
+        if (!folder || folder.ownerId !== req.userId) {
+            return res.status(404).json({ error: "Folder not found" });
+        }
+
+        // Recursive function to find all subfolder IDs
+        const getAllSubfolderIds = async (rootId: string): Promise<string[]> => {
+            const children = await prisma.folder.findMany({
+                where: { parentId: rootId },
+                select: { id: true }
+            });
+            let ids = children.map(c => c.id);
+            for (const childId of ids) {
+                ids = [...ids, ...(await getAllSubfolderIds(childId))];
+            }
+            return ids;
+        };
+
+        const subfolderIds = await getAllSubfolderIds(folderId);
+        const allFolderIds = [folderId, ...subfolderIds];
+
+        // Soft delete all files in these folders
+        await prisma.file.updateMany({
+            where: {
+                folderId: { in: allFolderIds },
+                ownerId: req.userId
+            },
+            data: {
+                isDeleted: true,
+                deletedAt: new Date()
+            }
+        });
+
+        // Delete the folders
+        // Due to Cascade delete on parentId, deleting the top folder should delete subfolders
+        // But we want to ensure files are handled first (above)
+        await prisma.folder.delete({
+            where: { id: folderId }
+        });
+
+        res.json({ success: true });
+    } catch (err) {
+        next(err);
+    }
+});
+
+router.patch("/:id", requireAuth, async (req: AuthRequest, res, next) => {
+    try {
+        const folderId = req.params.id;
+        const { name } = req.body;
+
+        if (!name) return res.status(400).json({ error: "Name is required" });
+
+        const folder = await prisma.folder.findUnique({ where: { id: folderId } });
+        if (!folder || folder.ownerId !== req.userId) {
+            return res.status(404).json({ error: "Folder not found" });
+        }
+
+        const updated = await prisma.folder.update({
+            where: { id: folderId },
+            data: { name }
+        });
+
+        res.json(updated);
+    } catch (err) {
+        next(err);
+    }
+});
+
 export default router;
