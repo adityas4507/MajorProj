@@ -1,0 +1,17 @@
+[Unit]
+Description=MajorProj Node.js Server
+After=network.target multi-user.target
+
+[Service]
+User=pi
+WorkingDirectory=/home/pi/MajorProj/server
+ExecStart=/usr/bin/npm start
+Restart=always
+Environment=NODE_ENV=production
+Environment=PORT=3000
+Environment=STORAGE_PRIMARY=/mnt/disk1/majorproj_storage
+Environment=STORAGE_MIRROR=/mnt/disk2/majorproj_storage
+Environment=CLAMAV_PATH=/usr/bin/clamscan
+
+[Install]
+WantedBy=multi-user.target
