@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { toast } from 'react-hot-toast';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { authApi } from '../api/auth';
 import { useAuth } from '../hooks/useAuth';
 
@@ -9,23 +9,7 @@ export const Login: React.FC = () => {
     const [password, setPassword] = useState('');
     const { login } = useAuth();
     const navigate = useNavigate();
-    const [searchParams] = useSearchParams();
 
-    // Handle Google OAuth callback
-    React.useEffect(() => {
-        const token = searchParams.get('token');
-        const refreshToken = searchParams.get('refreshToken');
-
-        if (token && refreshToken) {
-            // Fetch user details
-            authApi.getMe()
-                .then((user) => {
-                    login(token, refreshToken, user);
-                    navigate('/');
-                })
-                .catch(() => toast.error('Failed to login with Google'));
-        }
-    }, [searchParams, login, navigate]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -83,13 +67,29 @@ export const Login: React.FC = () => {
                         </div>
                     </div>
 
-                    <a
-                        href="http://localhost:3000/auth/google"
-                        className="mt-4 w-full flex items-center justify-center gap-2 border border-gray-300 dark:border-gray-600 rounded-md py-2 px-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200"
-                    >
-                        <img src="https://www.google.com/favicon.ico" alt="Google" className="w-5 h-5" />
-                        <span>Google</span>
-                    </a>
+                    <div className="mt-4 flex gap-2">
+                        <button
+                            type="button"
+                            disabled
+                            className="flex-1 flex items-center justify-center gap-2 border border-gray-300 dark:border-gray-600 rounded-md py-2 px-4 bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 cursor-not-allowed opacity-60"
+                        >
+                            <img
+                                src="https://www.google.com/favicon.ico"
+                                alt="Google"
+                                className="w-5 h-5 opacity-50 grayscale"
+                            />
+                            <span>Google</span>
+                        </button>
+                        <button
+                            type="button"
+                            className="flex items-center justify-center border border-gray-300 dark:border-gray-600 rounded-md py-2 px-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors bg-white dark:bg-gray-700 text-gray-500 dark:text-gray-400"
+                            onClick={() => toast('Only works in the hosted version', { icon: 'ℹ️' })}
+                            title="Only works in the hosted version"
+                        >
+                            ?
+                        </button>
+                    </div>
+
                 </div>
 
                 <p className="mt-4 text-center text-sm text-gray-600 dark:text-gray-400">
