@@ -141,7 +141,7 @@ The system follows a **three-tier architecture**:
 
 - 'npm start' or 'pm2 start app.js'
 
-- Server runs at: http://<raspberry-pi-ip>:3000
+- Server runs at: http://"raspberry-pi-ip-address":3000
 
 ### 📈 Performance Summary
 
