@@ -122,7 +122,7 @@ The system follows a **three-tier architecture**:
 
 ### 3️⃣ Clone Repository
 
-- git clone [https://github.com/Aditya-1708/MajorProj.git](https://github.com/adityas4507/MajorProj.git)
+- git clone [https://github.com/adityas4507/MajorProj.git](https://github.com/adityas4507/MajorProj.git)
 - cd MajorProj
 
 ### 4️⃣ Install Dependencies
